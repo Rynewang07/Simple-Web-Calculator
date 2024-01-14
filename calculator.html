@@ -2,6 +2,7 @@
 <html lang="en-US">
 <head>
     <title>Messing around with web dev</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
     body{
         background-color: #25222c;
@@ -121,19 +122,19 @@
         function takeInput(input){  
             console.log("input is", input);
             console.log("Debug info:\ndecimal = ", decimal, "\nopenParen = ", openParen, "\nexpression = ", expression);
-            if ("1234567890".includes(input) && expression.slice(-1) != ")"){
+            if ("1234567890".includes(input)){
                 expression = expression.concat(input);
             } else if (input == "." && decimal == false){
-                if ("1234567890".includes(expression.slice(-1))){
+                if ("1234567890".includes(expression.slice(-1)) && expression.length != 0){
                     expression = expression.concat(input);
                 }else {
                     expression = expression.concat("0.")
                 }
                 decimal = true;
-            } else if (!("+-*/(^".includes(expression.slice(-1)||expression.length==0)) && "+-*/^".includes(input)){
+            } else if (!("+-*/(^".includes(expression.slice(-1)||expression.length==0)) && expression.length != 0 && "+-*/^".includes(input)){
                 expression = expression.concat(input);
                 decimal = false;
-            }else if (input == "(" && ".".includes(expression.slice(-1))){
+            }else if (input == "(" && !(".".includes(expression.slice(-1)))){
                 expression = expression.concat("(");
                 openParen++;
             }else if (input == ")" && !("+-*/(".includes(expression.slice(-1))) && openParen > 0){
@@ -184,6 +185,11 @@
                     }
                 }
             }
+            for (let i = 0; i < openParenl; i++){
+                expression = expression.concat(")");
+            }
+            openParen = 0;
+            console.log("preprocessed string is:", expression);
         }
         
         function doMath(){
