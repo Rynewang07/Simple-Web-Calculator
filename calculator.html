@@ -107,7 +107,7 @@
         let expression = "";
         let decimal = false;
         let openParen = 0;
-
+        
         document.addEventListener('keydown', function(event) {
             if (event.key == "Backspace"){
                 del();
@@ -124,20 +124,20 @@
             console.log("Debug info:\ndecimal = ", decimal, "\nopenParen = ", openParen, "\nexpression = ", expression);
             if ("1234567890".includes(input)){
                 expression = expression.concat(input);
-            } else if (input == "." && decimal == false){
-                if ("1234567890".includes(expression.slice(-1)) && expression.length != 0){
+            } else if (input == "." && /\.\d*$/.test(expression)){
+                if (/\d$/.test(expression)){
                     expression = expression.concat(input);
                 }else {
                     expression = expression.concat("0.")
                 }
                 decimal = true;
-            } else if (!("+-*/(^".includes(expression.slice(-1)||expression.length==0)) && expression.length != 0 && "+-*/^".includes(input)){
+            } else if (/[^\*\-\+\/]$/.test(expression) && "+-*/^".includes(input)){
                 expression = expression.concat(input);
                 decimal = false;
-            }else if (input == "(" && (expression.length== 0||!(".".includes(expression.slice(-1))))){
+            }else if (input == "(" && /[^\.]$/.test(expression)){
                 expression = expression.concat("(");
                 openParen++;
-            }else if (input == ")" && !("+-*/(".includes(expression.slice(-1))) && openParen > 0){
+            }else if (input == ")" && /[^\*\-\+\/\^]$/.test(expression) && openParen > 0){
                 expression = expression.concat(")");
                 openParen--;
             }
@@ -156,14 +156,7 @@
             }else if (expression.slice(-1) == ".") {
                 decimal = false;
             }else if ("+-*/".includes(expression.slice(-1))){
-                for (let i = 2; i < expression.length; i++){
-                    if (expression.slice(-i,-i+1) == "."){
-                        decimal = true;
-                        i = expression.length;
-                    } else if ("+-*/".includes(expression.slice(-i))){
-                        i = expression.length;
-                    }
-                }
+                decimal = /\.\d*$/.test(expression);
             }
             console.log("Debug info:\ndecimal = ", decimal, "\nopenParen = ", openParen, "\nexpression = ", expression);
             expression = expression.slice(0,-1)
@@ -176,22 +169,12 @@
         
                 
         function preprocess (){
-            for (let i = 0; i < expression.length; i++){
-                if (expression.slice(i,i+1) == "^"){
-                    expression = expression.slice(0,i) + "**" + expression.slice(i+1)
-                } else if (expression.slice(i,i+1) == "(" && i-1 >= 0){
-                    if ("1234567890)".includes(expression.slice(i-1,i))){
-                        expression = expression.slice(0,i) + "*" + expression.slice(i);
-                        preprocess()
-                        break;
-                    }
-                } else if (expression.slice(i,i+1) == ")" && i+1 < expression.length){
-                    if ("1234567890(".includes(expression.slice(i+1,i+2))){
-                        expression = expression.slice(0,i+1) + "*" + expression.slice(i+1);
-                        preprocess()
-                        break;
-                    }
-                }
+            let impliedMulti = /(\d\(|\)\d)/
+            while (expression.search(impliedMulti) != -1){
+                expression = expression.slice(0,expression.search(impliedMulti)+1) + "*" + expression.slice(expression.search(impliedMulti)+1)
+            };
+            while (expression.search('^')){
+                expression = expression.slice(0,expression.search('^')+1) + "*" + expression.slice(expression.search('^')+1);
             }
             for (let i = 0; i < openParen; i++){
                 expression = expression.concat(")");
