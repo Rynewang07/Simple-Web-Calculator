@@ -165,8 +165,9 @@
             while (expression.search(impliedMulti) != -1){
                 expression = expression.slice(0,expression.search(impliedMulti)+1) + "*" + expression.slice(expression.search(impliedMulti)+1)
             };
-            while (expression.search('^')){
-                expression = expression.slice(0,expression.search('^')+1) + "*" + expression.slice(expression.search('^')+1);
+            while (expression.search(/\^/) != -1){
+                expression = expression.slice(0,expression.search(/\^/)) + "**" + expression.slice(expression.search(/\^/)+1);
+                console.log(expression);
             }
             for (let i = 0; i < openParen; i++){
                 expression = expression.concat(")");
