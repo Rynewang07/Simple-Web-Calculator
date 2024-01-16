@@ -18,6 +18,7 @@
         padding: 0px;
         margin-top: 0px;
         margin-bottom: 2px;
+        font-family: 'Courier New', Courier, monospace;
     }
     .calculator{
         margin-left: calc(50% - 215px);
@@ -70,34 +71,34 @@
 <body>
     <div class="calculator">
     <p id="calculatorText">  </p>
-    <button type="button" class="calcButton" onclick="clr()"> CE </button>
-    <button type="button" class="calcButton" onclick="del()"> Delete </button>
-    <button type="button" class="calcButton" onclick='takeInput("(")'> ( </button>
-    <button type="button" class="calcButton" onclick="takeInput(')')"> ) </button>
+    <button type="button" class="calcButton" onclick="this.blur(); clr()"> CE </button>
+    <button type="button" class="calcButton" onclick="this.blur(); del()"> Delete </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('(')"> ( </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput(')')"> ) </button>
     <br>
 
-    <button type="button" class="calcButton" onclick="takeInput('1')"> 1 </button>
-    <button type="button" class="calcButton" onclick="takeInput('2')"> 2 </button>
-    <button type="button" class="calcButton" onclick="takeInput('3')"> 3 </button>
-    <button type="button" class="calcButton operators" onclick="takeInput('+')"> + </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('1')"> 1 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('2')"> 2 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('3')"> 3 </button>
+    <button type="button" class="calcButton operators" onclick="this.blur(); takeInput('+')"> + </button>
     <br>
 
-    <button type="button" class="calcButton" onclick="takeInput('4')"> 4 </button>
-    <button type="button" class="calcButton" onclick="takeInput('5')"> 5 </button>
-    <button type="button" class="calcButton" onclick="takeInput('6')"> 6 </button>
-    <button type="button" class="calcButton operators" onclick="takeInput('-')"> - </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('4')"> 4 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('5')"> 5 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('6')"> 6 </button>
+    <button type="button" class="calcButton operators" onclick="this.blur(); takeInput('-')"> - </button>
     <br>
 
-    <button type="button" class="calcButton" onclick="takeInput('7')"> 7 </button>
-    <button type="button" class="calcButton" onclick="takeInput('8')"> 8 </button>
-    <button type="button" class="calcButton" onclick="takeInput('9')"> 9 </button>
-    <button type="button" class="calcButton operators" onclick="takeInput('*')"> x </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('7')"> 7 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('8')"> 8 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('9')"> 9 </button>
+    <button type="button" class="calcButton operators" onclick="this.blur(); takeInput('*')"> x </button>
     <br>
 
-    <button type="button" class="calcButton" onclick="takeInput('0')"> 0 </button>
-    <button type="button" class="calcButton" onclick="takeInput('^')"> ^ </button>
-    <button type="button" class="calcButton" onclick="takeInput('.')"> . </button>
-    <button type="button" class="calcButton operators" onclick="takeInput('/')"> / </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('0')"> 0 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('^')"> ^ </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('.')"> . </button>
+    <button type="button" class="calcButton operators" onclick="this.blur(); takeInput('/')"> / </button>
     <br>
 
     <button type="button" class="doMathButton" onclick="doMath()"> Do Math </button>
@@ -121,25 +122,26 @@
         function takeInput(input){  
             console.log("input is", input);
             console.log("Debug info:\nopenParen = ", openParen, "\nexpression = ", expression);
-            if ("1234567890".includes(input)){
-                expression = expression.concat(input);
-            } else if (input == "." && !(/\.\d*$/.test(expression))){
-                if (/\d$/.test(expression)){
+            if (expression.length < 16){
+                if ("1234567890".includes(input)){
                     expression = expression.concat(input);
-                }else {
-                    expression = expression.concat("0.")
+                } else if (input == "." && !(/\.\d*$/.test(expression))){
+                    if (/\d$/.test(expression)){
+                        expression = expression.concat(input);
+                    }else {
+                        expression = expression.concat("0.")
+                    }
+                } else if (/[^\^\*\-\+\/]$/.test(expression) && "+-*/^".includes(input)){
+                    expression = expression.concat(input);
+                }else if (input == "(" && /[^\.]$/.test(expression)){
+                    expression = expression.concat("(");
+                    openParen++;
+                }else if (input == ")" && /[^\*\-\+\/\^\(]$/.test(expression) && openParen > 0){
+                    expression = expression.concat(")");
+                    openParen--;
                 }
-            } else if (/[^\*\-\+\/]$/.test(expression) && "+-*/^".includes(input)){
-                expression = expression.concat(input);
-            }else if (input == "(" && /[^\.]$/.test(expression)){
-                expression = expression.concat("(");
-                openParen++;
-            }else if (input == ")" && /[^\*\-\+\/\^]$/.test(expression) && openParen > 0){
-                expression = expression.concat(")");
-                openParen--;
+                document.getElementById("calculatorText").innerHTML = expression;
             }
-            document.getElementById("calculatorText").innerHTML = expression;
-
         }
         function del (){
             console.log("input is del")
@@ -160,31 +162,31 @@
         }
         
                 
-        function preprocess (){
+        function preprocess (data){
             let impliedMulti = /(\d\(|\)\d)/
-            while (expression.search(impliedMulti) != -1){
-                expression = expression.slice(0,expression.search(impliedMulti)+1) + "*" + expression.slice(expression.search(impliedMulti)+1)
+            while (data.search(impliedMulti) != -1){
+                data = data.slice(0,data.search(impliedMulti)+1) + "*" + data.slice(data.search(impliedMulti)+1)
             };
-            while (expression.search(/\^/) != -1){
-                expression = expression.slice(0,expression.search(/\^/)) + "**" + expression.slice(expression.search(/\^/)+1);
-                console.log(expression);
+            while (data.search(/\^/) != -1){
+                data = data.slice(0,data.search(/\^/)) + "**" + data.slice(data.search(/\^/)+1);
+                console.log(data);
             }
             for (let i = 0; i < openParen; i++){
-                expression = expression.concat(")");
+                data = data.concat(")");
             }
             openParen = 0;
-            console.log("preprocessed string is:", expression);
+            console.log("preprocessed string is:", data);
+            return (data);
         }
         
         function doMath(){
             console.log(expression);
-            preprocess()
             try{
-                document.getElementById("calculatorText").innerHTML = eval(expression);
+                document.getElementById("calculatorText").innerHTML = eval(preprocess(expression));
                 expression = "";
             }
             catch{
-                document.getElementById("errorBox").innerHTML = "ERROR"
+                console.log("invalid expression");
             }
             
         }
