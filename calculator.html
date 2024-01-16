@@ -105,7 +105,6 @@
 </body>
     <script>
         let expression = "";
-        let decimal = false;
         let openParen = 0;
         
         document.addEventListener('keydown', function(event) {
@@ -121,19 +120,17 @@
         });
         function takeInput(input){  
             console.log("input is", input);
-            console.log("Debug info:\ndecimal = ", decimal, "\nopenParen = ", openParen, "\nexpression = ", expression);
+            console.log("Debug info:\nopenParen = ", openParen, "\nexpression = ", expression);
             if ("1234567890".includes(input)){
                 expression = expression.concat(input);
-            } else if (input == "." && /\.\d*$/.test(expression)){
+            } else if (input == "." && !(/\.\d*$/.test(expression))){
                 if (/\d$/.test(expression)){
                     expression = expression.concat(input);
                 }else {
                     expression = expression.concat("0.")
                 }
-                decimal = true;
             } else if (/[^\*\-\+\/]$/.test(expression) && "+-*/^".includes(input)){
                 expression = expression.concat(input);
-                decimal = false;
             }else if (input == "(" && /[^\.]$/.test(expression)){
                 expression = expression.concat("(");
                 openParen++;
@@ -147,18 +144,13 @@
         function del (){
             console.log("input is del")
             if (expression.length <= 1){
-                decimal = false;
                 expression = "";
             }else if(expression.slice(-1)==")"){
                 openParen ++;
             }else if(expression.slice(-1) == "("){
                 openParen --;
-            }else if (expression.slice(-1) == ".") {
-                decimal = false;
-            }else if ("+-*/".includes(expression.slice(-1))){
-                decimal = /\.\d*$/.test(expression);
             }
-            console.log("Debug info:\ndecimal = ", decimal, "\nopenParen = ", openParen, "\nexpression = ", expression);
+            console.log("Debug info:\nopenParen = ", openParen, "\nexpression = ", expression);
             expression = expression.slice(0,-1)
             document.getElementById("calculatorText").innerHTML = expression;
         }
@@ -184,7 +176,6 @@
         }
         
         function doMath(){
-            decimal = false;
             console.log(expression);
             preprocess()
             try{
