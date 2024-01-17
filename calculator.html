@@ -21,9 +21,16 @@
         font-family: 'Courier New', Courier, monospace;
     }
     .calculator{
-        margin-left: calc(50% - 215px);
+        margin-left: calc(50% - 217px);
         width: 429px;
-        margin-top: 10%;
+        margin-top: calc(10%);
+        position: absolute;
+    }
+    .calculatorexpansion1{
+        margin-left: calc(50% - 325px);
+        width: 100px;
+        margin-top: calc(10% + 52px);
+        position: absolute;
     }
     .calcButton{
         background-color: #58741c; 
@@ -103,6 +110,22 @@
 
     <button type="button" class="doMathButton" onclick="doMath()"> Do Math </button>
     </div>
+    <div class="calculatorexpansion1">
+        <button type="button" class="calcButton" onclick="this.blur()"> NEW </button>
+        <br>
+        
+        <button type="button" class="calcButton" onclick="this.blur()"> NEW </button>
+        <br>
+
+        <button type="button" class="calcButton" onclick="this.blur()"> NEW </button>
+        <br>
+
+        <button type="button" class="calcButton" onclick="this.blur()"> NEW </button>
+        <br>
+        
+        <button type="button" class="calcButton" onclick="this.blur()"> NEW </button>
+        <br>
+    </div>
 </body>
     <script>
         let expression = "";
@@ -131,9 +154,12 @@
                     }else {
                         expression = expression.concat("0.")
                     }
-                } else if (/[^\^\*\-\+\/]$/.test(expression) && "+-*/^".includes(input)){
+                } else if (/[^\^\*\-\+\/\(]$/.test(expression) && "+*/^".includes(input)){
                     expression = expression.concat(input);
-                }else if (input == "(" && /[^\.]$/.test(expression)){
+                } else if (/[^\^\*\-\+\/]$/.test(expression) && "-" == input){
+                    expression = expression/concat(expression);
+                }
+                else if (input == "(" && !(/\.$/.test(expression))){
                     expression = expression.concat("(");
                     openParen++;
                 }else if (input == ")" && /[^\*\-\+\/\^\(]$/.test(expression) && openParen > 0){
@@ -167,27 +193,93 @@
             while (data.search(impliedMulti) != -1){
                 data = data.slice(0,data.search(impliedMulti)+1) + "*" + data.slice(data.search(impliedMulti)+1)
             };
-            while (data.search(/\^/) != -1){
-                data = data.slice(0,data.search(/\^/)) + "**" + data.slice(data.search(/\^/)+1);
-                console.log(data);
-            }
             for (let i = 0; i < openParen; i++){
                 data = data.concat(")");
             }
             openParen = 0;
             console.log("preprocessed string is:", data);
-            return (data);
+            let storageString = "";
+            const output = [];
+            while (data.length != 0){
+                if (/^\d+\.?\d*/.test(data)){
+                    storageString = (data.match(/^\d+\.?\d*/));
+                    console.log(storageString," is storage string")
+                    data = data.slice(storageString[0].length);
+                    output.push(parseInt(storageString));
+                }else{
+                    output.push(data.slice(0,1));
+                    data = data.slice(1);
+                }
+            }
+            console.log("fucking dumbass the output is", output)
+            return (output);
         }
-        
-        function doMath(){
+
+        function doMathBetter (equation){
+            console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHH")
+            console.log(equation);
+            let indexClose = 0;
+            let indexOpen = 0;
+            let operatorIndex = 0;
+            while (equation.includes("(")){
+                console.log("parenshit")
+                indexOpen = equation.indexOf("(");
+                indexClose = equation.lastIndexOf(")");
+                equation = equation.slice(0,indexOpen).concat(doMathBetter(indexOpen+1, indexClose(")"))).concat(equation.slice(indexClose+1));
+            }
+            while (equation.includes("^")){
+                console.log("exp")
+                operatorIndex = equation.indexOf("^");
+                equation = doOperation(equation, "^", operatorIndex)
+            }
+            while (equation.includes("*") || equation.includes("/")){
+                console.log("doing */")
+                operatorIndex = equation.findIndex((element) => /\*|\//.test(element));
+                if (equation[operatorIndex] == "*"){
+                    equation = doOperation(equation, "*", operatorIndex)
+                } else{
+                    equation = doOperation(equation, "/", operatorIndex)
+                }
+            }
+            while (equation.includes("+") || equation.includes("-")){
+                console.log("doing+-")
+                operatorIndex = equation.findIndex((element) => /\+|-/.test(element));
+                
+                if (equation[operatorIndex] == "+"){
+                    equation = doOperation(equation, "+", operatorIndex)
+                } else{
+                    equation = doOperation(equation, "-", operatorIndex)
+                }
+            }
+            return equation;
+        }
+        function doOperation (equation,operation,operatorIndex){
+            storageArr = equation.slice(0,operatorIndex-1);
+            let num = 0
+            if (operation == "^"){
+                num = equation[operatorIndex-1]**equation[operatorIndex+1];
+            }else if (operation == "*"){
+                num = equation[operatorIndex-1]*equation[operatorIndex+1];
+            }else if (operation == "/"){
+                num = equation[operatorIndex-1]/equation[operatorIndex+1];
+            }else if (operation == "+"){
+                num = equation[operatorIndex-1]+equation[operatorIndex+1];
+            }else if (operation == "-"){
+                num = equation[operatorIndex-1]-equation[operatorIndex+1];
+            }
+            console.log(num);
+            return storageArr.concat(num).concat(equation.slice(operatorIndex+2));
+        }
+        function doMath(equation){
             console.log(expression);
-            try{
-                document.getElementById("calculatorText").innerHTML = eval(preprocess(expression));
+            equationArr = preprocess(expression)
+            //try{
+                document.getElementById("calculatorText").innerHTML = doMathBetter(equationArr);
                 expression = "";
-            }
-            catch{
-                console.log("invalid expression");
-            }
+            //}
+            //catch{
+            //    console.log("invalid expression");
+            //}
             
         }
     </script>
