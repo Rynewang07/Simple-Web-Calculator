@@ -205,7 +205,7 @@
                     storageString = (data.match(/^\d+\.?\d*/));
                     console.log(storageString," is storage string")
                     data = data.slice(storageString[0].length);
-                    output.push(parseInt(storageString));
+                    output.push(parseFloat(storageString));
                 }else{
                     output.push(data.slice(0,1));
                     data = data.slice(1);
@@ -225,7 +225,8 @@
                 console.log("parenshit")
                 indexOpen = equation.indexOf("(");
                 indexClose = equation.lastIndexOf(")");
-                equation = equation.slice(0,indexOpen).concat(doMathBetter(indexOpen+1, indexClose(")"))).concat(equation.slice(indexClose+1));
+                console.log();
+                equation = equation.slice(0,indexOpen).concat(doMathBetter(equation.slice(indexOpen+1, indexClose))).concat(equation.slice(indexClose+1));
             }
             while (equation.includes("^")){
                 console.log("exp")
@@ -274,8 +275,9 @@
             console.log(expression);
             equationArr = preprocess(expression)
             //try{
-                document.getElementById("calculatorText").innerHTML = doMathBetter(equationArr);
-                expression = "";
+                expression = doMathBetter(equationArr).toString();
+                document.getElementById("calculatorText").innerHTML = expression;
+                
             //}
             //catch{
             //    console.log("invalid expression");
