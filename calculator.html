@@ -140,7 +140,7 @@
 let expression = "";
 let openParen = 0;
 let displayExpression = ""
-//code for getting KB input
+
 document.addEventListener('keydown', function(event) {
     if (event.key == "Backspace"){
         del();
@@ -152,16 +152,13 @@ document.addEventListener('keydown', function(event) {
         takeInput(event.key);
     }
 });
-
-/**
- * takes checks if input is valid for the current expression, and updates the display.
- * @param {String} - input a string containing the input to validate and add 
- */
- function takeInput(input) {  
+function takeInput(input){  
     console.log("input is", input);
     console.log("Debug info:\nopenParen = ", openParen, "\nexpression = ", expression);
-    if (displayExpression.length < 16){//keeps the display from flowing out of the display box
-        if (input.length > 1){ //checks if the input is a function, since all other inputs are 1 char
+    if (displayExpression.length < 16){
+        if (input.length > 1){
+            console.log("REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+            console.log(input);
             if (input == "cos("){
                 expression=expression.concat("cos(")
                 openParen ++;
@@ -182,21 +179,21 @@ document.addEventListener('keydown', function(event) {
                 openParen++;
             }
         }
-        if ("1234567890".includes(input)) {//nuber input
+        if ("1234567890".includes(input)){
             expression = expression.concat(input);
-        } else if (input == "." && !(/\.\d*$/.test(expression))) {//allows decimal input if there is not another decimal in the same term
+        } else if (input == "." && !(/\.\d*$/.test(expression))){
             if (/\d$/.test(expression)){
                 expression = expression.concat(input);
-            }else {//if the decimal is the first char of the term automatically adds 0 infront
+            }else {
                 expression = expression.concat("0.")
             }
-        } else if (/[^\^\*\-\+\/\(]$/.test(expression) && "+*/^-".includes(input)){//allows a operator input as long as it is not next to another operator
+        } else if (/[^\^\*\-\+\/\(]$/.test(expression) && "+*/^-".includes(input)){
             expression = expression.concat(input);
         }
-        else if (input == "(" && !(/\.$/.test(expression))){//allows a ( input as long as its not next to a decimal
+        else if (input == "(" && !(/\.$/.test(expression))){
             expression = expression.concat("(");
             openParen++;
-        }else if (input == ")" && /[^\*\-\+\/\^\(]$/.test(expression) && openParen > 0){//allows a ) input only if there is a open parenthesis and it does not follow an operator
+        }else if (input == ")" && /[^\*\-\+\/\^\(]$/.test(expression) && openParen > 0){
             expression = expression.concat(")");
             openParen--;
         }
@@ -317,7 +314,7 @@ function doMathBetter (equation){
     }
     while (equation.some((element) => /[a-z]{3}/.test(element))){//checks for functions
         operatorIndex = equation.findIndex((element) => /[a-z]{3}/.test(element));
-        console.log("evaluating function a function:" , equation[operatorIndex]);
+        console.log("evaluating function a function:" , equation[operatorIndex],"/nopreator index :", operatorIndex);
         equation = doFunc(equation, operatorIndex);   
     }
     while (equation.includes("^")){//checks for operators in the order of pemdas
@@ -332,7 +329,8 @@ function doMathBetter (equation){
     }
     while (equation.includes("+") || equation.includes("-")){
         console.log("evaluating +/-")
-        operatorIndex = equation.findIndex((element) => /\+|-^/.test(element));
+        operatorIndex = equation.findIndex((element) => /\+|-/.test(element));
+        console.log(operatorIndex)
         equation = doOperation(equation, operatorIndex)
     }
     return equation;
@@ -364,9 +362,11 @@ function doOperation (equation,operatorIndex){
  * @param equation - expression in the form of an array
  * @operator index - the index where the operation should take place, should point towards an 3 letter function
  */
-function doFunc (equation,operation,operatorIndex){
+function doFunc (equation,operatorIndex){
     storageArr = equation.slice(0,operatorIndex);
     let num = 0;
+    console.log(operatorIndex);
+    console.log("function is" , equation[operatorIndex])
     if (equation[operatorIndex] == "sin"){
         num = Math.sin(equation[operatorIndex+1]);
     } else if (equation[operatorIndex] == "cos"){
@@ -391,7 +391,7 @@ function doMath(equation){
         equationArr = preprocess(expression);
         let answer = doMathBetter(equationArr).toString();
         display(answer);
-        if (!(/[a-zA-Z]{4}/.test(answer))){
+        if (!(/[a-zA-Z]{2}/.test(answer))){//checks if the results consists of more than 2 letters (e would be allowed)
             expression = answer;
         }else {
             expression = "";
