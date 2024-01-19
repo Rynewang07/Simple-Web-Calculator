@@ -18,11 +18,24 @@
         padding: 0px;
         margin-top: 0px;
         margin-bottom: 2px;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    span.graytext{
+        font-size: 45px;
+        font-family: 'Courier New', Courier, monospace;
+        color: rgba(240, 240, 240,0.5);
     }
     .calculator{
-        margin-left: calc(50% - 215px);
+        margin-left: calc(50% - 217px);
         width: 429px;
-        margin-top: 10%;
+        margin-top: calc(10%);
+        position: absolute;
+    }
+    .calculatorexpansion1{
+        margin-left: calc(50% - 325px);
+        width: 100px;
+        margin-top: calc(10% + 52px);
+        position: absolute;
     }
     .calcButton{
         background-color: #58741c; 
@@ -47,6 +60,10 @@
         background-color: rgba(255, 255, 255, 0.84);
         color : #2f3d0f;
     }
+    .calcButton.operators:hover{
+        background-color: rgba(255, 255, 255, 1);
+        color : #2f3d0f;
+    }
     .doMathButton{
         background-color: #58741c; 
         border: none;
@@ -69,150 +86,322 @@
 </head>
 <body>
     <div class="calculator">
-    <p id="calculatorText">  </p>
-    <button type="button" class="calcButton" onclick="clr()"> CE </button>
-    <button type="button" class="calcButton" onclick="del()"> Delete </button>
-    <button type="button" class="calcButton" onclick='takeInput("(")'> ( </button>
-    <button type="button" class="calcButton" onclick="takeInput(')')"> ) </button>
+    <p id="calculatorText"><span id="main_span"></span><span class="graytext" id="gray_span"></span></p>
+    <button type="button" class="calcButton" onclick="this.blur(); clr()"> CE </button>
+    <button type="button" class="calcButton" onclick="this.blur(); del()"> Delete </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('(')"> ( </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput(')')"> ) </button>
     <br>
 
-    <button type="button" class="calcButton" onclick="takeInput('1')"> 1 </button>
-    <button type="button" class="calcButton" onclick="takeInput('2')"> 2 </button>
-    <button type="button" class="calcButton" onclick="takeInput('3')"> 3 </button>
-    <button type="button" class="calcButton operators" onclick="takeInput('+')"> + </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('1')"> 1 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('2')"> 2 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('3')"> 3 </button>
+    <button type="button" class="calcButton operators" onclick="this.blur(); takeInput('+')"> + </button>
     <br>
 
-    <button type="button" class="calcButton" onclick="takeInput('4')"> 4 </button>
-    <button type="button" class="calcButton" onclick="takeInput('5')"> 5 </button>
-    <button type="button" class="calcButton" onclick="takeInput('6')"> 6 </button>
-    <button type="button" class="calcButton operators" onclick="takeInput('-')"> - </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('4')"> 4 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('5')"> 5 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('6')"> 6 </button>
+    <button type="button" class="calcButton operators" onclick="this.blur(); takeInput('-')"> - </button>
     <br>
 
-    <button type="button" class="calcButton" onclick="takeInput('7')"> 7 </button>
-    <button type="button" class="calcButton" onclick="takeInput('8')"> 8 </button>
-    <button type="button" class="calcButton" onclick="takeInput('9')"> 9 </button>
-    <button type="button" class="calcButton operators" onclick="takeInput('*')"> x </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('7')"> 7 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('8')"> 8 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('9')"> 9 </button>
+    <button type="button" class="calcButton operators" onclick="this.blur(); takeInput('*')"> x </button>
     <br>
 
-    <button type="button" class="calcButton" onclick="takeInput('0')"> 0 </button>
-    <button type="button" class="calcButton" onclick="takeInput('^')"> ^ </button>
-    <button type="button" class="calcButton" onclick="takeInput('.')"> . </button>
-    <button type="button" class="calcButton operators" onclick="takeInput('/')"> / </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('0')"> 0 </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('^')"> ^ </button>
+    <button type="button" class="calcButton" onclick="this.blur(); takeInput('.')"> . </button>
+    <button type="button" class="calcButton operators" onclick="this.blur(); takeInput('/')"> / </button>
     <br>
 
     <button type="button" class="doMathButton" onclick="doMath()"> Do Math </button>
     </div>
+    <div class="calculatorexpansion1">
+        <button type="button" class="calcButton" onclick="this.blur(); takeInput('sin(')"> sin </button>
+        <br>
+        
+        <button type="button" class="calcButton" onclick="this.blur(); takeInput('cos(')"> cos </button>
+        <br>
+
+        <button type="button" class="calcButton" onclick="this.blur(); takeInput('tan(')"> tan </button>
+        <br>
+
+        <button type="button" class="calcButton" onclick="this.blur(); takeInput('log(')"> log </button>
+        <br>
+        
+        <button type="button" class="calcButton" onclick="this.blur(); takeInput('neg')"> neg </button>
+        <br>
+    </div>
 </body>
-    <script>
-        let expression = "";
-        let decimal = false;
-        let openParen = 0;
+<script>
+let expression = "";
+let openParen = 0;
+let displayExpression = ""
 
-        document.addEventListener('keydown', function(event) {
-            if (event.key == "Backspace"){
-                del();
-            }else if (event.key == "Enter"){
-                doMath();
-            }
-            else{
-                console.log("keypress: ", event.key);
-                takeInput(event.key);
-            }
-        });
-        function takeInput(input){  
-            console.log("input is", input);
-            console.log("Debug info:\ndecimal = ", decimal, "\nopenParen = ", openParen, "\nexpression = ", expression);
-            if ("1234567890".includes(input)){
-                expression = expression.concat(input);
-            } else if (input == "." && decimal == false){
-                if ("1234567890".includes(expression.slice(-1)) && expression.length != 0){
-                    expression = expression.concat(input);
-                }else {
-                    expression = expression.concat("0.")
-                }
-                decimal = true;
-            } else if (!("+-*/(^".includes(expression.slice(-1)||expression.length==0)) && expression.length != 0 && "+-*/^".includes(input)){
-                expression = expression.concat(input);
-                decimal = false;
-            }else if (input == "(" && (expression.length== 0||!(".".includes(expression.slice(-1))))){
-                expression = expression.concat("(");
-                openParen++;
-            }else if (input == ")" && !("+-*/(".includes(expression.slice(-1))) && openParen > 0){
-                expression = expression.concat(")");
-                openParen--;
-            }
-            document.getElementById("calculatorText").innerHTML = expression;
-
-        }
-        function del (){
-            console.log("input is del")
-            if (expression.length <= 1){
-                decimal = false;
-                expression = "";
-            }else if(expression.slice(-1)==")"){
+document.addEventListener('keydown', function(event) {
+    if (event.key == "Backspace"){
+        del();
+    }else if (event.key == "Enter"){
+        doMath();
+    }
+    else{
+        console.log("keypress: ", event.key);
+        takeInput(event.key);
+    }
+});
+function takeInput(input){  
+    console.log("input is", input);
+    console.log("Debug info:\nopenParen = ", openParen, "\nexpression = ", expression);
+    if (displayExpression.length < 16){
+        if (input.length > 1){
+            console.log("REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+            console.log(input);
+            if (input == "cos("){
+                expression=expression.concat("cos(")
                 openParen ++;
-            }else if(expression.slice(-1) == "("){
-                openParen --;
-            }else if (expression.slice(-1) == ".") {
-                decimal = false;
-            }else if ("+-*/".includes(expression.slice(-1))){
-                for (let i = 2; i < expression.length; i++){
-                    if (expression.slice(-i,-i+1) == "."){
-                        decimal = true;
-                        i = expression.length;
-                    } else if ("+-*/".includes(expression.slice(-i))){
-                        i = expression.length;
-                    }
-                }
             }
-            console.log("Debug info:\ndecimal = ", decimal, "\nopenParen = ", openParen, "\nexpression = ", expression);
-            expression = expression.slice(0,-1)
-            document.getElementById("calculatorText").innerHTML = expression;
+            else if (input == "sin("){
+                expression=expression.concat("sin(")
+                openParen++;
+            }
+            else if (input == "tan("){
+                expression=expression.concat("tan(")
+                openParen++;
+            }
+            else if (input == "neg"){
+                expression=expression.concat("neg")
+            }
+            else if (input == "log("){
+                expression=expression.concat("log(")
+                openParen++;
+            }
         }
-        function clr(){
-            expression = "";
-            document.getElementById("calculatorText").innerHTML = expression;
+        if ("1234567890".includes(input)){
+            expression = expression.concat(input);
+        } else if (input == "." && !(/\.\d*$/.test(expression))){
+            if (/\d$/.test(expression)){
+                expression = expression.concat(input);
+            }else {
+                expression = expression.concat("0.")
+            }
+        } else if (/[^\^\*\-\+\/\(]$/.test(expression) && "+*/^-".includes(input)){
+            expression = expression.concat(input);
         }
-        
-                
-        function preprocess (){
-            for (let i = 0; i < expression.length; i++){
-                if (expression.slice(i,i+1) == "^"){
-                    expression = expression.slice(0,i) + "**" + expression.slice(i+1)
-                } else if (expression.slice(i,i+1) == "(" && i-1 >= 0){
-                    if ("1234567890)".includes(expression.slice(i-1,i))){
-                        expression = expression.slice(0,i) + "*" + expression.slice(i);
-                        preprocess()
-                        break;
-                    }
-                } else if (expression.slice(i,i+1) == ")" && i+1 < expression.length){
-                    if ("1234567890(".includes(expression.slice(i+1,i+2))){
-                        expression = expression.slice(0,i+1) + "*" + expression.slice(i+1);
-                        preprocess()
-                        break;
-                    }
-                }
-            }
-            for (let i = 0; i < openParen; i++){
-                expression = expression.concat(")");
-            }
-            openParen = 0;
-            console.log("preprocessed string is:", expression);
+        else if (input == "(" && !(/\.$/.test(expression))){
+            expression = expression.concat("(");
+            openParen++;
+        }else if (input == ")" && /[^\*\-\+\/\^\(]$/.test(expression) && openParen > 0){
+            expression = expression.concat(")");
+            openParen--;
         }
-        
-        function doMath(){
-            decimal = false;
-            console.log(expression);
-            preprocess()
-            try{
-                document.getElementById("calculatorText").innerHTML = eval(expression);
-                expression = "";
+        displayExpression = display(expression);
+    }
+}
+
+/**
+ * Takes the expressions and changes it to a more understandable form then put it on the HTML display. 
+ * @param {String} equation - the equation to edit and display
+ */
+function display(equation){
+    let funcIndex = 0
+    while (/neg/.test(equation)){
+        funcIndex = equation.search(/neg/);
+        console.log(funcIndex, "is func index")
+        equation = equation.slice(0, funcIndex) + "-" + equation.slice(funcIndex+3)
+    }
+    console.log(equation);
+    document.getElementById("main_span").textContent = equation;
+    console.log(document.getElementById("gray_span").textContent=")".repeat(openParen));
+    return equation;
+}
+
+
+// deletes the last char and upadates the display
+function del (){
+    console.log("input is del")
+    if(expression.slice(-1)==")"){//checks if removing a char would change the open parenthesis count
+        openParen ++;
+    }else if(expression.slice(-1) == "("){
+        openParen --;
+    }
+    console.log("Debug info:\nopenParen = ", openParen, "\nexpression = ", expression);
+    expression = expression.slice(0,-1)
+    display(expression);
+}
+
+//clears the saved expression
+function clr(){
+    expression = "";
+    openParen = 0;
+    display(expression);
+}
+
+/**
+ * preprocess the expression into a array for evaluating the function
+ * @param {String} data - the expression to preprocess
+ */  
+function preprocess (data){
+    let impliedMulti = /(\d\(|\)\d)/;//checks for "#(" or ")#"
+    let parenMulti = /\)\(/;//checks for ")("
+    let impliedMultiFuncs = /(\d|\))[a-z]{3}/;//checks for numbers next to functions
+    while (data.search(impliedMulti) != -1){//these while loops check for implied mutliplcation and adds *
+        data = data.slice(0,data.search(impliedMulti)+1) + "*" + data.slice(data.search(impliedMulti)+1)
+    };
+    while (data.search(parenMulti) != -1){
+        data = data.slice(0,data.search(parenMulti)+1) + "*" + data.slice(data.search(parenMulti)+1)
+    };
+    while (data.search(impliedMultiFuncs) != -1){
+        data = data.slice(0,data.search(impliedMultiFuncs)+1) + "*" + data.slice(data.search(impliedMultiFuncs)+1)
+    };
+    for (let i = 0; i < openParen; i++){//automatically closes all open parenthesis
+        data = data.concat(")");
+    }
+    openParen = 0;
+    console.log("preprocessed string is:", data);
+    const output = [];
+    while (data.length != 0){//reads each term and operator and then adds each of them into a list
+        if (/^\d+\.?\d*/.test(data)){//matches terms
+            storageString = (data.match(/^\d+\.?\d*/));
+            console.log(storageString," is storage string")
+            data = data.slice(storageString[0].length);
+            output.push(parseFloat(storageString));
+        }else if (/^[a-z]{3}/.test(data)){//matches functins
+            storageString = (data.match(/^[a-z]{3}/));
+            console.log(storageString," is storage string")
+            data = data.slice(storageString[0].length);
+            output.push(storageString[0]);
+        }else {//others
+            if (data.slice(0,1) != ","){
+                output.push(data.slice(0,1));
             }
-            catch{
-                document.getElementById("errorBox").innerHTML = "ERROR"
-            }
+            data = data.slice(1);
             
         }
-    </script>
+    }
+    console.log("fucking dumbass the output is", output);//lets you know politely what the preprocessed expression returns
+    return (output);
+}
+
+/**
+ * evaluates a expression following pemdas
+ * @param {array} equation - a array that contains each term function and operator.
+ */
+function doMathBetter (equation){
+    console.log("Evaluting:",equation);
+    let indexClose = 0;
+    let indexOpen = 0;
+    let operatorIndex = 0;
+    while (equation.includes("(")){//looks for a set of parenthesis then uses recursion to evaluates the insides of that set
+        console.log("Evaluating a set of parenthesis")
+        indexOpen = equation.indexOf("(");
+        let openParenCount = 1;
+        for (let i = indexOpen + 1; i < equation.length; i++){// looks for the parenthesis that closes the open one
+            if (equation[i] === "("){
+                openParenCount ++;
+            }else if (equation[i] === ")"){
+                openParenCount --;
+            }
+            if (openParenCount == 0){
+                indexClose = i;
+                break
+            }   
+        }
+        console.log();
+        equation = equation.slice(0,indexOpen).concat(doMathBetter(equation.slice(indexOpen+1, indexClose))).concat(equation.slice(indexClose+1));//cuts out the section inside parenthesis and replaces with what the return of the recursion
+    }
+    while (equation.some((element) => /[a-z]{3}/.test(element))){//checks for functions
+        operatorIndex = equation.findIndex((element) => /[a-z]{3}/.test(element));
+        console.log("evaluating function a function:" , equation[operatorIndex]);
+        equation = doFunc(equation, operatorIndex);   
+    }
+    while (equation.includes("^")){//checks for operators in the order of pemdas
+        console.log("evaluating exponents")
+        operatorIndex = equation.indexOf("^");
+        equation = doOperation(equation, operatorIndex)
+    }
+    while (equation.includes("*") || equation.includes("/")){
+        console.log("evaluating multi/div");
+        operatorIndex = equation.findIndex((element) => /\*|\//.test(element));
+        equation = doOperation(equation, operatorIndex)
+    }
+    while (equation.includes("+") || equation.includes("-")){
+        console.log("evaluating +/-")
+        operatorIndex = equation.findIndex((element) => /\+|-^/.test(element));
+        equation = doOperation(equation, operatorIndex)
+    }
+    return equation;
+}
+/**
+ * does a operation and returns a array with the operated terms replaced with the results of the operation
+ * @param equation - expression in the form of the array
+ * @param operatorIndex - the index where the operation should take place, should point towards an operator
+ */
+function doOperation (equation,operatorIndex){
+    storageArr = equation.slice(0,operatorIndex-1);
+    let num = 0
+    if (equation[operatorIndex] == "^"){
+        num = equation[operatorIndex-1]**equation[operatorIndex+1];
+    }else if (equation[operatorIndex] == "*"){
+        num = equation[operatorIndex-1]*equation[operatorIndex+1];
+    }else if (equation[operatorIndex] == "/"){
+        num = equation[operatorIndex-1]/equation[operatorIndex+1];
+    }else if (equation[operatorIndex] == "+"){
+        num = equation[operatorIndex-1]+equation[operatorIndex+1];
+    }else if (equation[operatorIndex] == "-"){
+        num = equation[operatorIndex-1]-equation[operatorIndex+1];
+    } 
+    console.log(num);
+    return storageArr.concat(num).concat(equation.slice(operatorIndex+2));
+}
+/**
+ * evaluates a functions and returns the expression array with the function evaluated
+ * @param equation - expression in the form of an array
+ * @operator index - the index where the operation should take place, should point towards an 3 letter function
+ */
+function doFunc (equation,operation,operatorIndex){
+    storageArr = equation.slice(0,operatorIndex);
+    let num = 0;
+    if (equation[operatorIndex] == "sin"){
+        num = Math.sin(equation[operatorIndex+1]);
+    } else if (equation[operatorIndex] == "cos"){
+        num = Math.cos(equation[operatorIndex+1]);
+    } else if (equation[operatorIndex] == "tan"){
+        num = Math.tan(equation[operatorIndex+1]);
+    } else if (equation[operatorIndex] == "log"){
+        num = Math.log(equation[operatorIndex+1]);
+    } else if (equation[operatorIndex] == "neg"){
+        num = -(equation[operatorIndex+1]);
+    }
+    console.log(num);
+    return storageArr.concat(num).concat(equation.slice(operatorIndex+2));
+}
+/**
+ * function that runs the evaluating and preprocessing process and displays the results
+ * @param expression - expression being evaluated
+ */
+function doMath(equation){
+    console.log(expression);
+    if (/[^\*\-\+\/\^\(]$/.test(expression) && expression.length < 17){
+        equationArr = preprocess(expression);
+        let answer = doMathBetter(equationArr).toString();
+        display(answer);
+        if (!(/[a-zA-Z]{4}/.test(answer))){
+            expression = answer;
+        }else {
+            expression = "";
+        }
+    }
+    //try{
+        
+    //}
+    //catch{
+    //    console.log("invalid expression");
+    //}
+    
+}
+</script>
 </body>
 </html>
