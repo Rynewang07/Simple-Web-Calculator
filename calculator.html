@@ -223,14 +223,17 @@ function display(equation){
 // deletes the last char and upadates the display
 function del (){
     console.log("input is del")
-    if(expression.slice(-1)==")"){//checks if removing a char would change the open parenthesis count
+    let delExp = preprocess(expression)
+    if(delExp.slice(-1)==")"){//checks if removing a char would change the open parenthesis count
         openParen ++;
-    }else if(expression.slice(-1) == "("){
+    }else if(delExp.slice(-1) == "("){
         openParen --;
     }
     console.log("Debug info:\nopenParen = ", openParen, "\nexpression = ", expression);
-    expression = expression.slice(0,-1)
+    expression = delExp.slice(0,-1).join('');
+    console.log(expression)
     displayExpression =  display(expression);
+
 }
 
 //clears the saved expression
@@ -258,10 +261,6 @@ function preprocess (data){
     while (data.search(impliedMultiFuncs) != -1){
         data = data.slice(0,data.search(impliedMultiFuncs)+1) + "*" + data.slice(data.search(impliedMultiFuncs)+1)
     };
-    for (let i = 0; i < openParen; i++){//automatically closes all open parenthesis
-        data = data.concat(")");
-    }
-    openParen = 0;
     console.log("preprocessed string is:", data);
     const output = [];
     while (data.length != 0){//reads each term and operator and then adds each of them into a list
@@ -391,6 +390,10 @@ function doMath(equation){
     console.log(expression);
     if (/[^\*\-\+\/\^\(]$/.test(expression) && expression.length < 17){
         equationArr = preprocess(expression);
+        for (let i = 0; i < openParen; i++){//automatically closes all open parenthesis
+            equationArr = equationArr.push(")");
+        }
+        openParen = 0;
         let answer = doMathBetter(equationArr).toString();
         display(answer);
         if (!(/[a-zA-Z]{2}/.test(answer))){//checks if the results consists of more than 2 letters (e would be allowed)
